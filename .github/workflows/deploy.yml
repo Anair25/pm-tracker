@@ -8,35 +8,23 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 🔧 Create build folder and inject secrets there
-      - name: Prepare build with Firebase config
+      - name: Inject Firebase secrets
         run: |
-          mkdir build
-          cp index.html build/
+          sed -i "s|%%FIREBASE_API_KEY%%|${{ secrets.FIREBASE_API_KEY }}|g" index.html
+          sed -i "s|%%FIREBASE_AUTH_DOMAIN%%|${{ secrets.FIREBASE_AUTH_DOMAIN }}|g" index.html
+          sed -i "s|%%FIREBASE_PROJECT_ID%%|${{ secrets.FIREBASE_PROJECT_ID }}|g" index.html
+          sed -i "s|%%FIREBASE_STORAGE_BUCKET%%|${{ secrets.FIREBASE_STORAGE_BUCKET }}|g" index.html
+          sed -i "s|%%FIREBASE_MESSAGING_SENDER_ID%%|${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}|g" index.html
+          sed -i "s|%%FIREBASE_APP_ID%%|${{ secrets.FIREBASE_APP_ID }}|g" index.html
+          sed -i "s|%%FIREBASE_USER_UID%%|${{ secrets.FIREBASE_USER_UID }}|g" index.html
 
-          sed -i "s|%%FIREBASE_API_KEY%%|${{ secrets.FIREBASE_API_KEY }}|g" build/index.html
-          sed -i "s|%%FIREBASE_AUTH_DOMAIN%%|${{ secrets.FIREBASE_AUTH_DOMAIN }}|g" build/index.html
-          sed -i "s|%%FIREBASE_PROJECT_ID%%|${{ secrets.FIREBASE_PROJECT_ID }}|g" build/index.html
-          sed -i "s|%%FIREBASE_STORAGE_BUCKET%%|${{ secrets.FIREBASE_STORAGE_BUCKET }}|g" build/index.html
-          sed -i "s|%%FIREBASE_MESSAGING_SENDER_ID%%|${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}|g" build/index.html
-          sed -i "s|%%FIREBASE_APP_ID%%|${{ secrets.FIREBASE_APP_ID }}|g" build/index.html
-          sed -i "s|%%FIREBASE_USER_UID%%|${{ secrets.FIREBASE_USER_UID }}|g" build/index.html
-
-      # 🔍 Debug step (important — don’t skip)
-      - name: Verify replacement
-        run: |
-          echo "Checking injected values:"
-          grep "apiKey" build/index.html || true
-
-      # 🚀 Deploy ONLY the processed build folder
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: .
           publish_branch: gh-pages
