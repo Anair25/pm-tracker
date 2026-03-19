@@ -2,1190 +2,794 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>PM Tracker — Arun</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Alchemist's Codex — Arun</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0a0a0a;
-    --surface: #131313;
-    --surface2: #1a1a1a;
-    --surface3: #222;
-    --border: rgba(255,255,255,0.07);
-    --border-md: rgba(255,255,255,0.12);
-    --border-hi: rgba(255,255,255,0.18);
-    --text: #eeebe4;
-    --muted: #7a7670;
-    --faint: #333;
-    --faint-text: #4a4a4a;
-    --accent: #e8c547;
-    --accent-dim: rgba(232,197,71,0.1);
-    --accent-border: rgba(232,197,71,0.2);
-    --p1: #a78bfa; --p1-dim: rgba(167,139,250,0.1); --p1-border: rgba(167,139,250,0.25);
-    --p2: #34d399; --p2-dim: rgba(52,211,153,0.1); --p2-border: rgba(52,211,153,0.25);
-    --p3: #fb923c; --p3-dim: rgba(251,146,60,0.1); --p3-border: rgba(251,146,60,0.25);
-    --locked: #1a1a1a;
-    --locked-text: #3a3a3a;
-    --success-dim: rgba(52,211,153,0.08);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* LOADING */
-  #loading {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 16px;
-    z-index: 100;
-    transition: opacity 0.4s;
-  }
-
-  #loading.hidden { opacity: 0; pointer-events: none; }
-
-  .loader-logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 800;
-    color: var(--accent);
-  }
-
-  .loader-bar {
-    width: 120px; height: 2px;
-    background: var(--faint);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .loader-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 99px;
-    animation: load 1.2s ease forwards;
-  }
-
-  @keyframes load { from { width: 0 } to { width: 100% } }
-
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 48px 20px 80px;
-  }
-
-  /* HEADER */
-  .header { margin-bottom: 36px; }
-
-  .eyebrow {
-    font-family: 'Syne', sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 12px;
-    display: flex; align-items: center; gap: 10px;
-  }
-
-  .eyebrow::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(to right, var(--accent), transparent);
-    max-width: 80px;
-  }
-
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(26px, 5vw, 42px);
-    font-weight: 800; line-height: 1.1;
-    letter-spacing: -0.02em; margin-bottom: 8px;
-  }
-
-  h1 span { color: var(--accent); }
-  .subtitle { font-size: 13px; color: var(--muted); }
-
-  /* STATS */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px; margin-bottom: 24px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 10px; padding: 12px 14px;
-  }
-
-  .stat-label {
-    font-size: 10px; color: var(--muted);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; margin-bottom: 5px;
-  }
-
-  .stat-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 800;
-    color: var(--text); line-height: 1;
-  }
-
-  .stat-value.accent { color: var(--accent); }
-  .stat-sub { font-size: 11px; color: var(--faint-text); margin-top: 3px; }
-
-  /* PROGRESS */
-  .overall-progress {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 10px; padding: 16px 18px;
-    margin-bottom: 24px;
-  }
-
-  .progress-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 8px;
-  }
-
-  .progress-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700; color: var(--text);
-  }
-
-  .progress-pct {
-    font-family: 'Syne', sans-serif;
-    font-size: 12px; font-weight: 700; color: var(--accent);
-  }
-
-  .progress-track {
-    height: 5px; background: var(--faint);
-    border-radius: 99px; overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(to right, var(--p1), var(--accent));
-    border-radius: 99px;
-    transition: width 0.5s ease;
-  }
-
-  /* STREAK */
-  .streak-section {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 12px; padding: 18px 20px;
-    margin-bottom: 24px;
-  }
-
-  .streak-header {
-    display: flex; justify-content: space-between;
-    align-items: flex-start; margin-bottom: 14px;
-  }
-
-  .streak-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 12px; font-weight: 700; color: var(--text);
-  }
-
-  .streak-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-  .streak-count {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px; font-weight: 800;
-    color: var(--accent); line-height: 1; text-align: right;
-  }
-
-  .streak-count span { font-size: 12px; font-weight: 400; color: var(--muted); }
-
-  .habit-days-row {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 5px; margin-bottom: 5px;
-  }
-
-  .habit-day-label {
-    font-size: 10px; color: var(--faint-text);
-    text-align: center;
-    font-family: 'Syne', sans-serif; font-weight: 700;
-  }
-
-  .habit-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 5px; margin-bottom: 12px;
-  }
-
-  .habit-day {
-    aspect-ratio: 1; border-radius: 4px;
-    background: var(--faint); cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    border: 0.5px solid transparent;
-  }
-
-  .habit-day:hover { transform: scale(1.1); border-color: var(--border-md); }
-  .habit-day.done { background: var(--accent); }
-  .habit-day.today { border-color: var(--accent); }
-
-  .habit-actions { display: flex; gap: 8px; align-items: center; }
-
-  .btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700;
-    padding: 7px 13px; border-radius: 7px;
-    border: 0.5px solid var(--border-md);
-    background: transparent; color: var(--text);
-    cursor: pointer; transition: background 0.15s;
-    white-space: nowrap;
-  }
-
-  .btn:hover { background: var(--surface2); }
-
-  .btn-accent {
-    background: var(--accent-dim);
-    border-color: var(--accent-border);
-    color: var(--accent);
-  }
-
-  .btn-accent:hover { background: rgba(232,197,71,0.18); }
-  .streak-note { font-size: 11px; color: var(--muted); flex: 1; text-align: right; }
-
-  /* SECTION LABEL */
-  .section-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--faint-text); margin-bottom: 10px;
-  }
-
-  /* PHASES */
-  .phases { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
-
-  .phase {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 12px; overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .phase.complete { border-color: rgba(52,211,153,0.2); }
-
-  .phase-header {
-    padding: 16px 18px;
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer; user-select: none;
-    transition: background 0.15s;
-  }
-
-  .phase-header:hover { background: var(--surface2); }
-
-  .phase-dot {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 800; flex-shrink: 0;
-  }
-
-  .ph1 .phase-dot { background: var(--p1-dim); color: var(--p1); }
-  .ph2 .phase-dot { background: var(--p2-dim); color: var(--p2); }
-  .ph3 .phase-dot { background: var(--p3-dim); color: var(--p3); }
-
-  .phase-meta { flex: 1; }
-
-  .phase-meta h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    color: var(--text); margin-bottom: 2px;
-  }
-
-  .phase-meta p { font-size: 11px; color: var(--muted); }
-
-  .phase-right {
-    display: flex; flex-direction: column;
-    align-items: flex-end; gap: 4px; flex-shrink: 0;
-  }
-
-  .phase-badge {
-    font-size: 10px; font-weight: 600;
-    padding: 3px 9px; border-radius: 99px;
-  }
-
-  .ph1 .phase-badge { background: var(--p1-dim); color: var(--p1); }
-  .ph2 .phase-badge { background: var(--p2-dim); color: var(--p2); }
-  .ph3 .phase-badge { background: var(--p3-dim); color: var(--p3); }
-
-  .phase-progress-mini { font-size: 10px; color: var(--muted); }
-  .phase-progress-mini.done { color: var(--p2); }
-
-  .phase-progress-track {
-    width: 80px; height: 3px;
-    background: var(--faint); border-radius: 99px; overflow: hidden;
-  }
-
-  .ph1 .phase-progress-fill { background: var(--p1); }
-  .ph2 .phase-progress-fill { background: var(--p2); }
-  .ph3 .phase-progress-fill { background: var(--p3); }
-
-  .phase-progress-fill {
-    height: 100%; border-radius: 99px;
-    transition: width 0.4s ease;
-  }
-
-  .chevron {
-    font-size: 10px; color: var(--faint-text);
-    transition: transform 0.25s; flex-shrink: 0; margin-left: 2px;
-  }
-
-  .phase.open .chevron { transform: rotate(90deg); }
-
-  .phase-body {
-    border-top: 0.5px solid var(--border);
-    padding: 16px 18px; display: none;
-  }
-
-  .phase.open .phase-body { display: block; }
-
-  /* WEEK BLOCKS */
-  .week-block { margin-bottom: 18px; }
-  .week-block:last-of-type { margin-bottom: 0; }
-
-  /* LOCKED WEEK */
-  .week-block.locked {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  .week-block.locked .week-header { cursor: default; }
-
-  .week-header {
-    display: flex; align-items: center;
-    gap: 8px; margin-bottom: 10px;
-  }
-
-  .week-label-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--faint-text); flex: 1;
-  }
-
-  .week-pct { font-size: 10px; color: var(--faint-text); min-width: 28px; text-align: right; }
-
-  .lock-icon {
-    font-size: 12px; color: var(--faint-text);
-    flex-shrink: 0;
-  }
-
-  .week-check {
-    width: 17px; height: 17px; border-radius: 4px;
-    border: 1.5px solid var(--faint-text);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; color: transparent;
-    transition: all 0.15s; flex-shrink: 0; cursor: pointer;
-    background: transparent;
-  }
-
-  .week-check.done { background: var(--p2); border-color: var(--p2); color: #0a0a0a; }
-
-  /* UNLOCK BANNER */
-  .unlock-banner {
-    background: var(--accent-dim);
-    border: 0.5px solid var(--accent-border);
-    border-radius: 8px; padding: 10px 14px;
-    margin-bottom: 12px;
-    font-size: 12px; color: var(--accent);
-    display: flex; align-items: center; gap: 8px;
-    animation: pulse-in 0.4s ease;
-  }
-
-  @keyframes pulse-in {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* TASKS */
-  .task-row {
-    display: flex; gap: 10px;
-    margin-bottom: 10px; align-items: flex-start;
-  }
-
-  .task-check {
-    width: 17px; height: 17px; border-radius: 4px;
-    border: 1.5px solid var(--faint-text);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; color: transparent;
-    transition: all 0.2s; flex-shrink: 0;
-    cursor: pointer; margin-top: 2px; background: transparent;
-  }
-
-  .task-check.done { border-color: var(--p2); background: var(--success-dim); color: var(--p2); }
-
-  .task-content { flex: 1; }
-
-  .task-text {
-    font-size: 13px; color: var(--text);
-    line-height: 1.5; cursor: pointer; transition: color 0.15s;
-  }
-
-  .task-text.done { color: var(--faint-text); text-decoration: line-through; text-decoration-color: var(--faint-text); }
-  .task-sub { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; line-height: 1.4; }
-  .task-sub.done { color: var(--faint-text); }
-
-  /* RESOURCES */
-  .resources {
-    margin-top: 10px; margin-left: 27px;
-    display: flex; flex-wrap: wrap; gap: 6px;
-  }
-
-  .resource-link {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 500;
-    padding: 4px 10px; border-radius: 6px;
-    border: 0.5px solid var(--border-md);
-    background: var(--surface2);
-    color: var(--accent); text-decoration: none;
-    transition: background 0.15s, border-color 0.15s;
-    font-family: 'Syne', sans-serif;
-  }
-
-  .resource-link:hover { background: var(--surface3); border-color: var(--accent-border); }
-  .resource-link::before { content: '↗'; font-size: 10px; }
-
-  /* WEEK RESOURCES PANEL */
-  .week-resources {
-    background: var(--surface2);
-    border: 0.5px solid var(--border);
-    border-radius: 8px; padding: 12px 14px;
-    margin-bottom: 12px;
-  }
-
-  .week-resources-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 8px;
-  }
-
-  .resource-list { display: flex; flex-direction: column; gap: 6px; }
-
-  .resource-item {
-    display: flex; align-items: flex-start; gap: 8px;
-  }
-
-  .resource-item a {
-    font-size: 12px; color: var(--accent);
-    text-decoration: none; font-weight: 500;
-    transition: color 0.15s;
-  }
-
-  .resource-item a:hover { color: #f0d46a; }
-  .resource-item a::after { content: ' ↗'; font-size: 10px; opacity: 0.6; }
-  .resource-item-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-  /* NOTES */
-  .notes-section {
-    margin-top: 14px;
-    border-top: 0.5px solid var(--border);
-    padding-top: 12px;
-  }
-
-  .notes-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--faint-text); margin-bottom: 7px;
-  }
-
-  .notes-input {
-    width: 100%; background: var(--surface2);
-    border: 0.5px solid var(--border);
-    border-radius: 8px; padding: 10px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; color: var(--text);
-    resize: vertical; min-height: 68px;
-    line-height: 1.5; transition: border-color 0.2s; outline: none;
-  }
-
-  .notes-input::placeholder { color: var(--faint-text); }
-  .notes-input:focus { border-color: var(--border-hi); }
-
-  /* APRIL TASK */
-  .april-task {
-    background: var(--surface);
-    border: 0.5px solid var(--accent-border);
-    border-radius: 12px; padding: 16px 18px;
-    margin-bottom: 28px;
-    display: flex; align-items: flex-start; gap: 12px;
-  }
-
-  .april-icon {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--accent-dim); color: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
-  }
-
-  .april-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700; color: var(--accent);
-    margin-bottom: 4px;
-  }
-
-  .april-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
-
-  .april-check {
-    margin-left: auto; flex-shrink: 0;
-    width: 20px; height: 20px; border-radius: 5px;
-    border: 1.5px solid var(--accent-border);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: transparent; font-size: 10px;
-    transition: all 0.2s; background: transparent;
-  }
-
-  .april-check.done { background: var(--accent); border-color: var(--accent); color: #0a0a0a; }
-
-  /* MENTORS */
-  .mentors {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 8px; margin-bottom: 28px;
-  }
-
-  .mentor-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 10px; padding: 13px;
-    text-decoration: none; color: inherit;
-    transition: border-color 0.2s, background 0.2s;
-    display: block;
-  }
-
-  .mentor-card:hover { border-color: var(--border-hi); background: var(--surface2); }
-  .mentor-name { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-  .mentor-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
-  .mentor-link { font-size: 10px; color: var(--accent); margin-top: 6px; display: block; opacity: 0.7; }
-
-  /* BOTTOM */
-  .bottom-card {
-    background: var(--accent-dim);
-    border: 0.5px solid var(--accent-border);
-    border-radius: 12px; padding: 18px 20px;
-    display: flex; align-items: flex-start; gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .bottom-card h4 {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    color: var(--accent); margin-bottom: 4px;
-  }
-
-  .bottom-card p { font-size: 12px; color: #c9b96b; line-height: 1.6; }
-
-  /* SYNC STATUS */
-  .sync-status {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--muted);
-  }
-
-  .sync-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--p2); flex-shrink: 0;
-  }
-
-  .sync-dot.syncing { background: var(--accent); animation: blink 1s infinite; }
-  .sync-dot.error { background: #f87171; }
-
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  /* FOOTER */
-  .footer {
-    padding-top: 16px;
-    border-top: 0.5px solid var(--border);
-    font-size: 11px; color: var(--faint-text);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-
-  .reset-btn {
-    font-size: 11px; color: var(--faint-text);
-    background: none; border: none; cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    text-decoration: underline; text-underline-offset: 3px;
-    transition: color 0.15s; padding: 0;
-  }
-
-  .reset-btn:hover { color: var(--muted); }
-
-  /* TOAST */
-  #toast {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface3);
-    border: 0.5px solid var(--border-md);
-    border-radius: 8px; padding: 10px 18px;
-    font-size: 13px; color: var(--text);
-    transition: transform 0.3s ease;
-    z-index: 99; white-space: nowrap;
-  }
-
-  #toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .header { animation: fadeUp 0.4s ease both; }
-  .stats-row { animation: fadeUp 0.4s ease 0.05s both; }
-  .overall-progress { animation: fadeUp 0.4s ease 0.08s both; }
-  .streak-section { animation: fadeUp 0.4s ease 0.11s both; }
-
-  @media (max-width: 560px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .mentors { grid-template-columns: 1fr; }
-    .phase-badge { display: none; }
-    .phase-progress-track { display: none; }
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0e0c0a; --bg2: #141210;
+  --surface: #1a1714; --surface2: #221f1b; --surface3: #2a2620;
+  --border: rgba(180,140,60,0.12); --border-md: rgba(180,140,60,0.22); --border-hi: rgba(180,140,60,0.4);
+  --text: #e8dfc8; --text2: #b8a882; --muted: #7a6e58;
+  --faint: #2e2a24; --faint-text: #4a4438;
+  --gold: #c9a84c; --gold-dim: rgba(201,168,76,0.1); --gold-border: rgba(201,168,76,0.25);
+  --red: #8b2020; --red-bright: #c0392b; --red-dim: rgba(139,32,32,0.15); --red-border: rgba(139,32,32,0.3);
+  --success: #7a9e5a; --success-dim: rgba(122,158,90,0.12); --success-border: rgba(122,158,90,0.25);
+  --p1-dim: rgba(201,168,76,0.1); --p1-border: rgba(201,168,76,0.25);
+  --p2-dim: rgba(139,105,20,0.15); --p2-border: rgba(139,105,20,0.3);
+  --p3-dim: rgba(107,47,14,0.15); --p3-border: rgba(107,47,14,0.3);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 16px; line-height: 1.6; min-height: 100vh;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: min(600px,100vw); height: min(600px,100vw);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='195' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.06'/%3E%3Ccircle cx='200' cy='200' r='155' fill='none' stroke='%23c9a84c' stroke-width='0.3' opacity='0.05'/%3E%3Ccircle cx='200' cy='200' r='110' fill='none' stroke='%23c9a84c' stroke-width='0.3' opacity='0.04'/%3E%3Cpolygon points='200,20 380,310 20,310' fill='none' stroke='%23c9a84c' stroke-width='0.4' opacity='0.05'/%3E%3Cpolygon points='200,380 20,90 380,90' fill='none' stroke='%23c9a84c' stroke-width='0.4' opacity='0.05'/%3E%3Ccircle cx='200' cy='200' r='38' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.07'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.5;
+}
+
+/* LOADING */
+#loading {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px; z-index: 200; transition: opacity 0.6s;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+.loader-circle {
+  width: 56px; height: 56px;
+  border: 1.5px solid var(--gold-border); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-text {
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase;
+}
+
+/* LOGIN SCREEN */
+#login-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  display: none; align-items: center; justify-content: center;
+  z-index: 150;
+}
+#login-screen.visible { display: flex; }
+.login-card {
+  background: var(--surface); border: 0.5px solid var(--gold-border);
+  border-radius: 14px; padding: 36px 28px;
+  max-width: 320px; width: 90%;
+  text-align: center; position: relative; overflow: hidden;
+}
+.login-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--gold-dim), transparent 60%);
+  pointer-events: none;
+}
+.login-seal { font-size: 36px; margin-bottom: 14px; }
+.login-title {
+  font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900;
+  color: var(--text); margin-bottom: 6px; letter-spacing: 0.04em;
+}
+.login-title em { color: var(--gold); font-style: normal; }
+.login-subtitle {
+  font-size: 13px; color: var(--muted); font-style: italic;
+  margin-bottom: 24px; line-height: 1.5;
+}
+.login-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px; opacity: 0.35;
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 0.5px;
+  background: linear-gradient(to right, transparent, var(--gold));
+}
+.login-divider::after { background: linear-gradient(to left, transparent, var(--gold)); }
+.login-divider span { font-size: 10px; color: var(--gold); }
+.btn-google {
+  width: 100%; padding: 12px 16px;
+  background: var(--surface2); border: 0.5px solid var(--border-md);
+  border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  color: var(--text); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.btn-google:hover { background: var(--surface3); border-color: var(--gold-border); }
+.btn-google:active { transform: scale(0.98); }
+.google-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.login-note { font-size: 11px; color: var(--faint-text); font-style: italic; margin-top: 14px; line-height: 1.5; }
+
+/* ACCESS DENIED */
+#access-denied {
+  position: fixed; inset: 0; background: var(--bg);
+  display: none; align-items: center; justify-content: center;
+  z-index: 150;
+}
+#access-denied.visible { display: flex; }
+.denied-card {
+  background: var(--surface); border: 0.5px solid var(--red-border);
+  border-radius: 14px; padding: 36px 28px;
+  max-width: 320px; width: 90%; text-align: center;
+}
+.denied-title {
+  font-family: 'Cinzel', serif; font-size: 16px; font-weight: 900;
+  color: var(--red-bright); margin-bottom: 10px; letter-spacing: 0.04em;
+}
+.denied-sub { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6; margin-bottom: 20px; }
+.btn-signout {
+  font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+  padding: 9px 16px; border-radius: 5px;
+  border: 0.5px solid var(--red-border);
+  background: var(--red-dim); color: var(--red-bright);
+  cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* USER BAR */
+.user-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px; padding: 10px 12px;
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 8px;
+}
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gold-dim); border: 0.5px solid var(--gold-border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  color: var(--gold); flex-shrink: 0; overflow: hidden;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-name { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600; color: var(--text2); flex: 1; }
+.btn-signout-sm {
+  font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+  padding: 5px 10px; border-radius: 4px;
+  border: 0.5px solid var(--border-md);
+  background: transparent; color: var(--muted);
+  cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: all 0.15s;
+}
+.btn-signout-sm:hover { border-color: var(--red-border); color: var(--red-bright); }
+
+#toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface3); border: 0.5px solid var(--gold-border);
+  border-radius: 5px; padding: 9px 16px;
+  font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold);
+  letter-spacing: 0.06em; transition: transform 0.3s ease;
+  z-index: 99; white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+.container { max-width: 560px; margin: 0 auto; padding: 28px 16px 90px; position: relative; z-index: 1; }
+.header { margin-bottom: 20px; text-align: center; }
+.seal {
+  width: 44px; height: 44px; margin: 0 auto 10px;
+  border: 1px solid var(--gold-border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; background: var(--gold-dim);
+}
+.eyebrow {
+  font-family: 'Cinzel', serif; font-size: 9px; font-weight: 600;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 6px; opacity: 0.8;
+}
+h1 {
+  font-family: 'Cinzel', serif; font-size: clamp(20px,6vw,30px);
+  font-weight: 900; line-height: 1.15; letter-spacing: 0.03em;
+  color: var(--text); margin-bottom: 5px;
+}
+h1 em { color: var(--gold); font-style: normal; }
+.subtitle { font-size: 13px; color: var(--muted); font-style: italic; }
+.divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; opacity: 0.35; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: linear-gradient(to right, transparent, var(--gold)); }
+.divider::after { background: linear-gradient(to left, transparent, var(--gold)); }
+.divider-icon { font-size: 11px; color: var(--gold); flex-shrink: 0; }
+.stats-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 12px; }
+.stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 8px; padding: 11px 13px; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); opacity: 0.25; }
+.stat-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.stat-value { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--faint-text); margin-top: 2px; font-style: italic; }
+.overall-progress { background: var(--surface); border: 0.5px solid var(--border); border-radius: 8px; padding: 13px 15px; margin-bottom: 12px; position: relative; overflow: hidden; }
+.overall-progress::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); opacity: 0.25; }
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+.progress-pct { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--gold); }
+.progress-track { height: 4px; background: var(--faint); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(to right, var(--red-bright), var(--gold)); border-radius: 99px; transition: width 0.6s ease; }
+.focus-card { background: var(--surface); border: 0.5px solid var(--gold-border); border-radius: 10px; padding: 14px; margin-bottom: 12px; position: relative; overflow: hidden; }
+.focus-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--gold-dim), transparent 60%); pointer-events: none; }
+.focus-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.focus-icon { width: 26px; height: 26px; border-radius: 50%; background: var(--gold-dim); border: 0.5px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.focus-title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.focus-block { margin-bottom: 10px; }
+.focus-block:last-child { margin-bottom: 0; }
+.focus-block-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.focus-task { background: var(--surface2); border: 0.5px solid var(--border-md); border-radius: 6px; padding: 10px 12px; font-size: 14px; color: var(--text); line-height: 1.4; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.focus-task:active { background: var(--surface3); }
+.focus-task.next { opacity: 0.55; border-style: dashed; cursor: default; }
+.focus-task-sub { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 3px; display: block; }
+.focus-empty { font-size: 13px; color: var(--muted); font-style: italic; text-align: center; padding: 6px 0; }
+.streak-section { background: var(--surface); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.streak-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.streak-title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+.streak-sub { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 2px; }
+.streak-count { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; text-align: right; }
+.streak-count span { font-size: 10px; font-weight: 400; color: var(--muted); display: block; }
+.habit-days-row { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 4px; }
+.habit-day-label { font-family: 'Cinzel', serif; font-size: 9px; color: var(--faint-text); text-align: center; font-weight: 600; }
+.habit-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 10px; }
+.habit-day { aspect-ratio: 1; border-radius: 3px; background: var(--faint); cursor: pointer; transition: background 0.15s; border: 0.5px solid transparent; -webkit-tap-highlight-color: transparent; }
+.habit-day:active { transform: scale(1.1); }
+.habit-day.done { background: var(--gold); }
+.habit-day.today { border-color: var(--gold); }
+.habit-actions { display: flex; gap: 8px; align-items: center; }
+.btn { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; padding: 8px 13px; border-radius: 4px; border: 0.5px solid var(--border-md); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+.btn:active { background: var(--surface2); }
+.btn-gold { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+.btn-gold:active { background: rgba(201,168,76,0.18); }
+.streak-note { font-size: 11px; color: var(--muted); flex: 1; text-align: right; font-style: italic; }
+.section-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.section-label::after { content: ''; flex: 1; height: 0.5px; background: linear-gradient(to right, var(--border-md), transparent); }
+.phases { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.phase { background: var(--surface); border: 0.5px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color 0.2s; }
+.phase.complete { border-color: var(--success-border); }
+.phase-header { padding: 13px 15px; display: flex; align-items: center; gap: 11px; cursor: pointer; user-select: none; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
+.phase-header:active { background: var(--surface2); }
+.phase-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; flex-shrink: 0; }
+.ph1 .phase-num { background: var(--p1-dim); color: var(--gold); border: 0.5px solid var(--p1-border); }
+.ph2 .phase-num { background: var(--p2-dim); color: #c9a84c; border: 0.5px solid var(--p2-border); }
+.ph3 .phase-num { background: var(--p3-dim); color: #d4854a; border: 0.5px solid var(--p3-border); }
+.phase-meta { flex: 1; min-width: 0; }
+.phase-meta h3 { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 1px; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phase-meta p { font-size: 11px; color: var(--muted); font-style: italic; }
+.phase-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.phase-badge { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.04em; }
+.ph1 .phase-badge { background: var(--p1-dim); color: var(--gold); }
+.ph2 .phase-badge { background: var(--p2-dim); color: #c9a84c; }
+.ph3 .phase-badge { background: var(--p3-dim); color: #d4854a; }
+.phase-pct { font-size: 11px; color: var(--muted); font-style: italic; }
+.phase-pct.done { color: var(--success); }
+.chevron { font-size: 10px; color: var(--faint-text); transition: transform 0.25s; flex-shrink: 0; }
+.phase.open .chevron { transform: rotate(90deg); }
+.phase-body { border-top: 0.5px solid var(--border); padding: 13px 15px; display: none; }
+.phase.open .phase-body { display: block; }
+.week-block { margin-bottom: 16px; }
+.week-block:last-of-type { margin-bottom: 0; }
+.week-block.locked { opacity: 0.3; pointer-events: none; }
+.week-header { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.week-label-text { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); flex: 1; }
+.week-pct { font-size: 11px; color: var(--faint-text); }
+.week-check { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border-md); display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; transition: all 0.2s; flex-shrink: 0; cursor: pointer; background: transparent; -webkit-tap-highlight-color: transparent; }
+.week-check.done { background: var(--success); border-color: var(--success); color: #0a0a0a; }
+.unlock-banner { background: var(--gold-dim); border: 0.5px solid var(--gold-border); border-radius: 5px; padding: 8px 11px; margin-bottom: 9px; font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); letter-spacing: 0.04em; display: flex; align-items: center; gap: 7px; animation: slideIn 0.4s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+.week-resources { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; padding: 10px 11px; margin-bottom: 9px; }
+.week-resources-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.resource-list { display: flex; flex-direction: column; gap: 6px; }
+.resource-item a { font-size: 13px; color: var(--gold); text-decoration: none; font-style: italic; transition: color 0.15s; line-height: 1.4; display: block; }
+.resource-item a::before { content: '⟶ '; font-style: normal; font-size: 10px; opacity: 0.55; }
+.task-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; -webkit-tap-highlight-color: transparent; }
+.task-check { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border-md); display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; transition: all 0.2s; flex-shrink: 0; cursor: pointer; margin-top: 2px; background: transparent; }
+.task-check.done { border-color: var(--success); background: var(--success-dim); color: var(--success); }
+.task-content { flex: 1; }
+.task-text { font-size: 14px; color: var(--text); line-height: 1.5; cursor: pointer; transition: color 0.15s; }
+.task-text.done { color: var(--faint-text); text-decoration: line-through; text-decoration-color: var(--faint-text); }
+.task-sub { font-size: 12px; color: var(--muted); display: block; margin-top: 1px; font-style: italic; line-height: 1.4; }
+.task-sub.done { color: var(--faint-text); }
+.notes-section { margin-top: 12px; border-top: 0.5px solid var(--border); padding-top: 11px; }
+.notes-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint-text); margin-bottom: 6px; }
+.notes-input { width: 100%; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 5px; padding: 9px 11px; font-family: 'Crimson Pro', serif; font-size: 14px; color: var(--text); resize: vertical; min-height: 68px; line-height: 1.5; outline: none; transition: border-color 0.2s; }
+.notes-input::placeholder { color: var(--faint-text); font-style: italic; }
+.notes-input:focus { border-color: var(--gold-border); }
+.april-task { background: var(--surface); border: 0.5px solid var(--red-border); border-radius: 10px; padding: 13px 15px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 11px; }
+.april-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--red-dim); border: 0.5px solid var(--red-border); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.april-title { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--red-bright); margin-bottom: 4px; letter-spacing: 0.03em; }
+.april-desc { font-size: 13px; color: var(--muted); line-height: 1.5; font-style: italic; }
+.april-check { margin-left: auto; flex-shrink: 0; width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: transparent; font-size: 10px; transition: all 0.2s; background: transparent; -webkit-tap-highlight-color: transparent; }
+.april-check.done { background: var(--success); border-color: var(--success); color: #0a0a0a; }
+.mentors { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+.mentor-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 8px; padding: 11px 13px; text-decoration: none; color: inherit; transition: border-color 0.2s; display: flex; align-items: center; gap: 11px; -webkit-tap-highlight-color: transparent; }
+.mentor-card:active { border-color: var(--border-hi); background: var(--surface2); }
+.mentor-icon { width: 34px; height: 34px; border-radius: 50%; background: var(--gold-dim); border: 0.5px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+.mentor-info { flex: 1; }
+.mentor-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+.mentor-desc { font-size: 12px; color: var(--muted); font-style: italic; line-height: 1.3; }
+.mentor-arrow { font-size: 13px; color: var(--gold); opacity: 0.45; flex-shrink: 0; }
+.bottom-card { background: var(--surface); border: 0.5px solid var(--gold-border); border-radius: 10px; padding: 16px; margin-bottom: 18px; text-align: center; position: relative; overflow: hidden; }
+.bottom-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--gold-dim), transparent 60%); pointer-events: none; }
+.bottom-seal { font-size: 18px; margin-bottom: 7px; }
+.bottom-card h4 { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--gold); margin-bottom: 5px; letter-spacing: 0.08em; text-transform: uppercase; }
+.bottom-card p { font-size: 13px; color: var(--text2); line-height: 1.6; font-style: italic; }
+.sync-status { display: flex; align-items: center; gap: 6px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.sync-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+.sync-dot.syncing { background: var(--gold); animation: blink 1s infinite; }
+.sync-dot.error { background: var(--red-bright); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.footer { padding-top: 14px; border-top: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.reset-btn { font-family: 'Cinzel', serif; font-size: 9px; color: var(--faint-text); background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.15s; padding: 0; letter-spacing: 0.1em; text-transform: uppercase; }
+.reset-btn:hover { color: var(--muted); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.header{animation:fadeUp .5s ease both}
+.focus-card{animation:fadeUp .5s ease .05s both}
+.stats-row{animation:fadeUp .5s ease .08s both}
+.overall-progress{animation:fadeUp .5s ease .1s both}
+.streak-section{animation:fadeUp .5s ease .12s both}
+@media(min-width:560px){
+  .stats-row{grid-template-columns:repeat(4,1fr)}
+  .mentors{display:grid;grid-template-columns:repeat(3,1fr)}
+  .mentor-arrow{display:none}
+}
 </style>
 </head>
 <body>
 
 <div id="loading">
-  <div class="loader-logo">PM Tracker</div>
-  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-circle"></div>
+  <div class="loader-text">Transmuting...</div>
+</div>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-seal">⚗</div>
+    <div class="login-title">The Alchemist's <em>Codex</em></div>
+    <div class="login-subtitle">"A lesson without pain is meaningless."<br>— Edward Elric</div>
+    <div class="login-divider"><span>◆</span></div>
+    <button class="btn-google" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Enter with Google
+    </button>
+    <div class="login-note">Only the rightful alchemist may enter.</div>
+  </div>
+</div>
+
+<div id="access-denied">
+  <div class="denied-card">
+    <div style="font-size:32px;margin-bottom:12px">🔒</div>
+    <div class="denied-title">Access Denied</div>
+    <div class="denied-sub">This codex belongs to another alchemist. You do not have the right to enter.</div>
+    <button class="btn-signout" onclick="doSignOut()">Sign out</button>
+  </div>
 </div>
 
 <div id="toast"></div>
 
-<div class="container">
-
+<div class="container" id="app" style="display:none">
   <div class="header">
-    <div class="eyebrow">Arun M Nair · Performance Marketing</div>
-    <h1>Your 3-Month <span>Obsession</span> Tracker</h1>
-    <p class="subtitle">Complete weeks to unlock what comes next. Sync across all your devices.</p>
+    <div class="seal">⚗</div>
+    <div class="eyebrow">The Alchemist's Codex</div>
+    <h1>Arun's <em>Obsession</em> Tracker</h1>
+    <p class="subtitle">"A lesson without pain is meaningless." — Edward Elric</p>
+  </div>
+
+  <div class="user-bar">
+    <div class="user-avatar" id="user-avatar">A</div>
+    <div class="user-name" id="user-name">Arun</div>
+    <button class="btn-signout-sm" onclick="doSignOut()">Sign out</button>
+  </div>
+
+  <div class="focus-card">
+    <div class="focus-header">
+      <div class="focus-icon">⚔</div>
+      <div class="focus-title">Today's Transmutation</div>
+    </div>
+    <div id="focus-content"><div class="focus-empty">Loading your mission...</div></div>
   </div>
 
   <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Overall</div>
-      <div class="stat-value accent" id="stat-overall">0%</div>
-      <div class="stat-sub">complete</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Streak</div>
-      <div class="stat-value accent" id="stat-streak">0</div>
-      <div class="stat-sub">days in a row</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Tasks</div>
-      <div class="stat-value" id="stat-tasks">0</div>
-      <div class="stat-sub" id="stat-tasks-sub">of 17 done</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Weeks</div>
-      <div class="stat-value" id="stat-weeks">0</div>
-      <div class="stat-sub">of 7 done</div>
-    </div>
+    <div class="stat-card"><div class="stat-label">Mastery</div><div class="stat-value" id="stat-overall">0%</div><div class="stat-sub">overall</div></div>
+    <div class="stat-card"><div class="stat-label">Streak</div><div class="stat-value" id="stat-streak">0</div><div class="stat-sub">days in a row</div></div>
+    <div class="stat-card"><div class="stat-label">Tasks</div><div class="stat-value" id="stat-tasks">0</div><div class="stat-sub" id="stat-tasks-sub">of 17 done</div></div>
+    <div class="stat-card"><div class="stat-label">Weeks</div><div class="stat-value" id="stat-weeks">0</div><div class="stat-sub">of 7 done</div></div>
   </div>
 
   <div class="overall-progress">
     <div class="progress-header">
-      <span class="progress-label">Roadmap progress</span>
+      <span class="progress-label">Equivalent Exchange Progress</span>
       <span class="progress-pct" id="overall-pct">0%</span>
     </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="overall-bar" style="width:0%"></div>
-    </div>
+    <div class="progress-track"><div class="progress-fill" id="overall-bar" style="width:0%"></div></div>
   </div>
 
-  <!-- STREAK -->
   <div class="streak-section">
     <div class="streak-header">
-      <div>
-        <div class="streak-title">Daily habit streak</div>
-        <div class="streak-sub">30 min every morning — no exceptions</div>
-      </div>
-      <div class="streak-count" id="streak-display">0 <span>days</span></div>
+      <div><div class="streak-title">Daily Practice</div><div class="streak-sub">30 minutes every morning</div></div>
+      <div class="streak-count" id="streak-display">0<span>days</span></div>
     </div>
     <div class="habit-days-row" id="day-labels"></div>
     <div class="habit-grid" id="habit-grid"></div>
     <div class="habit-actions">
-      <button class="btn btn-accent" onclick="markToday()">✓ Mark today done</button>
+      <button class="btn btn-gold" onclick="markToday()">✓ Mark today</button>
       <button class="btn" onclick="undoToday()">Undo</button>
       <span class="streak-note" id="streak-note"></span>
     </div>
   </div>
 
-  <!-- APRIL TASK -->
-  <div class="april-task" id="april-task-block">
+  <div class="divider"><span class="divider-icon">◆</span></div>
+
+  <div class="april-task">
     <div class="april-icon">📅</div>
     <div style="flex:1">
-      <div class="april-title">April 1st — Set up Make.com email nudges</div>
-      <div class="april-desc">Your Make.com credits reset on April 1st. Set up the automation that checks Firebase every day and sends you a nudge email if you've been inactive for 2 days. Instructions: create a scenario → Firebase "watch documents" → filter by last_active date → Resend "send email" module.</div>
+      <div class="april-title">April 1st — Set Up Email Nudges</div>
+      <div class="april-desc">Make.com credits reset. Build: Firebase watch → filter last_active → Resend email if inactive 2+ days. Verstappen-style nudge tone.</div>
     </div>
     <div class="april-check" id="april-check" onclick="toggleApril()">✓</div>
   </div>
 
-  <!-- MENTORS -->
-  <div class="section-label">Your mentors</div>
+  <div class="section-label">Your Alchemists</div>
   <div class="mentors">
     <a class="mentor-card" href="https://jonloomer.com" target="_blank">
-      <div class="mentor-name">Jon Loomer</div>
-      <div class="mentor-desc">Deepest Meta practitioner alive. Start here for paid social mechanics.</div>
-      <span class="mentor-link">jonloomer.com ↗</span>
+      <div class="mentor-icon">JL</div>
+      <div class="mentor-info"><div class="mentor-name">Jon Loomer</div><div class="mentor-desc">Deepest Meta practitioner alive</div></div>
+      <span class="mentor-arrow">→</span>
     </a>
     <a class="mentor-card" href="https://www.kaushik.net/avinash/" target="_blank">
-      <div class="mentor-name">Avinash Kaushik</div>
-      <div class="mentor-desc">Analytics precision + business thinking. Your data north star.</div>
-      <span class="mentor-link">kaushik.net ↗</span>
+      <div class="mentor-icon">AK</div>
+      <div class="mentor-info"><div class="mentor-name">Avinash Kaushik</div><div class="mentor-desc">Analytics + business thinking</div></div>
+      <span class="mentor-arrow">→</span>
     </a>
     <a class="mentor-card" href="https://marketingexamples.com" target="_blank">
-      <div class="mentor-name">Harry Dry</div>
-      <div class="mentor-desc">Real-world creative strategy breakdowns. Learn what makes ads work.</div>
-      <span class="mentor-link">marketingexamples.com ↗</span>
+      <div class="mentor-icon">HD</div>
+      <div class="mentor-info"><div class="mentor-name">Harry Dry</div><div class="mentor-desc">Creative strategy breakdowns</div></div>
+      <span class="mentor-arrow">→</span>
     </a>
   </div>
 
-  <!-- PHASES -->
-  <div class="section-label">3-month roadmap</div>
+  <div class="section-label">The Codex</div>
   <div class="phases" id="phases-container"></div>
 
   <div class="bottom-card">
-    <div style="font-size:18px;flex-shrink:0">★</div>
-    <div>
-      <h4>The Verstappen standard</h4>
-      <p>Can I explain exactly why performance moved the way it did? Not roughly. Exactly. If you can't — that's your homework.</p>
-    </div>
+    <div class="bottom-seal">⚖</div>
+    <h4>The Law of Equivalent Exchange</h4>
+    <p>"Can I explain exactly why performance moved the way it did? Not roughly. Exactly. If you can't — that's your homework."</p>
   </div>
 
   <div class="footer">
-    <div class="sync-status">
-      <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-label">Synced</span>
-    </div>
-    <button class="reset-btn" onclick="confirmReset()">Reset all progress</button>
+    <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Synced</span></div>
+    <button class="reset-btn" onclick="confirmReset()">Reset Codex</button>
   </div>
-
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAbOR0aiMyYcaGDgtXwaGG3eljq5tnnMTA",
-  authDomain: "pm-tracker-9af09.firebaseapp.com",
-  projectId: "pm-tracker-9af09",
-  storageBucket: "pm-tracker-9af09.firebasestorage.app",
-  messagingSenderId: "677396361537",
-  appId: "1:677396361537:web:7cd0aaf18d71c344cdf1c0"
+  apiKey: "%%FIREBASE_API_KEY%%",
+  authDomain: "%%FIREBASE_AUTH_DOMAIN%%",
+  projectId: "%%FIREBASE_PROJECT_ID%%",
+  storageBucket: "%%FIREBASE_STORAGE_BUCKET%%",
+  messagingSenderId: "%%FIREBASE_MESSAGING_SENDER_ID%%",
+  appId: "%%FIREBASE_APP_ID%%"
 };
+
+const ALLOWED_UID = "%%FIREBASE_USER_UID%%";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 const DOC_REF = doc(db, "tracker", "arun");
 
-// ─── DATA ────────────────────────────────────────────────────────
 const PHASES = [
-  {
-    id: 'p1', cls: 'ph1', num: '1',
-    title: 'Foundations + diagnosis',
-    sub: 'Replace instinct with understanding',
-    badge: 'Weeks 1–4',
-    weeks: [
-      {
-        id: 'w1',
-        label: 'Week 1–2 · Meta mechanics',
-        resources: [
-          { label: 'Jon Loomer: Where to start', url: 'https://www.jonloomer.com/where-should-i-start/' },
-          { label: 'Jon Loomer: Beginner\'s guide', url: 'https://www.jonloomer.com/beginners-guide-to-meta-advertising/' },
-          { label: 'Meta Blueprint', url: 'https://www.facebook.com/business/learn' },
+  { id:'p1', cls:'ph1', num:'I', title:'Foundations & Diagnosis', sub:'Replace instinct with understanding', badge:'Weeks 1–4',
+    weeks:[
+      { id:'w1', label:'Week 1–2 · Meta Mechanics',
+        resources:[
+          {label:'Jon Loomer: Where to Start', url:'https://www.jonloomer.com/where-should-i-start/'},
+          {label:'Jon Loomer: Beginner\'s Guide to Meta Ads', url:'https://www.jonloomer.com/beginners-guide-to-meta-advertising/'},
+          {label:'Meta Blueprint — Free Courses', url:'https://www.facebook.com/business/learn'},
         ],
-        tasks: [
-          { id: 't1', text: 'Read Jon Loomer\'s beginner guide cover to cover', sub: 'Auction mechanics, learning phase, why constant edits kill campaigns' },
-          { id: 't2', text: 'Apply 4-point diagnosis to every live Meta campaign', sub: 'Audience → Creative → Offer → Tracking. Write it down, don\'t just think it.' },
+        tasks:[
+          {id:'t1', text:'Read Jon Loomer\'s beginner guide cover to cover', sub:'Auction mechanics, learning phase, why constant edits kill campaigns'},
+          {id:'t2', text:'Apply 4-point diagnosis to every live Meta campaign', sub:'Audience → Creative → Offer → Tracking. Write it, don\'t just think it.'},
         ]
       },
-      {
-        id: 'w2',
-        label: 'Week 3–4 · Google + analytics',
-        resources: [
-          { label: 'Google Skillshop: Search Ads', url: 'https://skillshop.exceedlms.com/student/catalog/list?category_ids=53-google-ads' },
-          { label: 'Avinash: Measurement Model', url: 'https://www.kaushik.net/avinash/digital-marketing-measurement-model/' },
-          { label: 'Avinash: Occam\'s Razor blog', url: 'https://www.kaushik.net/avinash/' },
+      { id:'w2', label:'Week 3–4 · Google & Analytics',
+        resources:[
+          {label:'Google Skillshop: Search Ads Certification', url:'https://skillshop.exceedlms.com/student/catalog/list?category_ids=53-google-ads'},
+          {label:'Avinash: Digital Marketing Measurement Model', url:'https://www.kaushik.net/avinash/digital-marketing-measurement-model/'},
+          {label:'Avinash: Occam\'s Razor Blog', url:'https://www.kaushik.net/avinash/'},
         ],
-        tasks: [
-          { id: 't3', text: 'Google Skillshop — Quality Score, match types, bidding strategies', sub: 'Understand the mechanics, not just which button to press' },
-          { id: 't4', text: 'Read Avinash\'s Measurement Model post + start Occam\'s Razor weekly', sub: 'One post per week, deeply — use AI to challenge your own diagnosis after' },
-          { id: 't5', text: 'Learn attribution — why last-click is lying to you', sub: 'View-through, data-driven models. Your ROAS is probably inflated. Know by how much.' },
+        tasks:[
+          {id:'t3', text:'Google Skillshop — Quality Score, match types, bidding strategies', sub:'Understand the mechanics, not just which button to press'},
+          {id:'t4', text:'Read Avinash\'s Measurement Model + start Occam\'s Razor weekly', sub:'One post per week, deeply. Use AI to challenge your diagnosis after.'},
+          {id:'t5', text:'Learn attribution — why last-click is lying to you', sub:'View-through, data-driven models. Your ROAS is probably inflated.'},
         ]
       }
     ]
   },
-  {
-    id: 'p2', cls: 'ph2', num: '2',
-    title: 'Creative strategy + business thinking',
-    sub: 'The two things that get you promoted',
-    badge: 'Weeks 5–9',
-    weeks: [
-      {
-        id: 'w3',
-        label: 'Week 5–6 · Creative strategy',
-        resources: [
-          { label: 'Harry Dry: Marketing Examples', url: 'https://marketingexamples.com' },
-          { label: 'Meta Ad Library', url: 'https://www.facebook.com/ads/library' },
-          { label: 'Jon Loomer: Creative testing', url: 'https://www.jonloomer.com/meta-ads-creative-testing/' },
+  { id:'p2', cls:'ph2', num:'II', title:'Creative & Business Thinking', sub:'The two things that get you promoted', badge:'Weeks 5–9',
+    weeks:[
+      { id:'w3', label:'Week 5–6 · Creative Strategy',
+        resources:[
+          {label:'Harry Dry: Marketing Examples', url:'https://marketingexamples.com'},
+          {label:'Meta Ad Library — Competitor Research', url:'https://www.facebook.com/ads/library'},
+          {label:'Jon Loomer: Creative Testing Guide', url:'https://www.jonloomer.com/meta-ads-creative-testing/'},
         ],
-        tasks: [
-          { id: 't6', text: 'Hook → Body → CTA — apply to every ad from now on', sub: 'First 3 seconds stop the scroll. Body speaks to pain. CTA is unmissable.' },
-          { id: 't7', text: 'Weekly competitor audit — Meta Ad Library, 3 competitors', sub: 'Reverse engineer what they\'re testing and why. Write one insight per session.' },
-          { id: 't8', text: 'Run your first real A/B test — one variable, hypothesis written first', sub: 'No "let\'s see what happens." Write the hypothesis before you launch. Always.' },
+        tasks:[
+          {id:'t6', text:'Hook → Body → CTA — apply to every ad you make', sub:'First 3 seconds stop the scroll. Body speaks to pain. CTA is unmissable.'},
+          {id:'t7', text:'Weekly competitor audit — Meta Ad Library, 3 competitors', sub:'Reverse engineer what they\'re testing. One insight per session, written down.'},
+          {id:'t8', text:'Run your first real A/B test — one variable, hypothesis first', sub:'Write the hypothesis before you launch. No "let\'s see what happens."'},
         ]
       },
-      {
-        id: 'w4',
-        label: 'Week 7–8 · Business thinking',
-        resources: [
-          { label: 'Avinash: See-Think-Do-Care framework', url: 'https://www.kaushik.net/avinash/see-think-do-care-win-content-marketing-measurement/' },
-          { label: 'LTV Calculator (Google Sheets template)', url: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms/edit' },
+      { id:'w4', label:'Week 7–8 · Business Thinking',
+        resources:[
+          {label:'Avinash: See-Think-Do-Care Framework', url:'https://www.kaushik.net/avinash/see-think-do-care-win-content-marketing-measurement/'},
+          {label:'Think with Google: Measurement Basics', url:'https://www.thinkwithgoogle.com/marketing-strategies/data-and-measurement/'},
         ],
-        tasks: [
-          { id: 't9', text: 'Calculate CAC, LTV, payback period from your own Kai campaigns', sub: 'Not from a template. From your actual numbers. This is the shift that matters.' },
-          { id: 't10', text: 'Rebuild your reporting around business outcomes', sub: '"We spent ₹X, acquired Y customers at ₹Z CAC against ₹W LTV" — not just ROAS' },
+        tasks:[
+          {id:'t9', text:'Calculate CAC, LTV, payback period from your Kai campaigns', sub:'Not from a template. From your actual numbers. This is the real shift.'},
+          {id:'t10', text:'Rebuild reporting around business outcomes, not metrics', sub:'"₹X spent, Y customers at ₹Z CAC against ₹W LTV" — not just ROAS'},
         ]
       },
-      {
-        id: 'w5',
-        label: 'Week 9 · Creative brief + reporting',
-        resources: [
-          { label: 'How to write a creative brief', url: 'https://www.notion.so/templates/creative-brief' },
-          { label: 'Marketing dashboard inspiration', url: 'https://datastudio.google.com/gallery' },
+      { id:'w5', label:'Week 9 · Briefs & Reporting',
+        resources:[
+          {label:'How to Write a Creative Brief', url:'https://marketingexamples.com/content/creative-brief'},
+          {label:'Looker Studio — Free Dashboard Tool', url:'https://lookerstudio.google.com'},
         ],
-        tasks: [
-          { id: 't11', text: 'Learn to write a proper creative brief', sub: 'Most performance marketers can\'t do this. Huge gap at mid-senior level.' },
-          { id: 't12', text: 'Build your personal reporting template', sub: 'What happened · Why · What next. For you, not your manager.' },
+        tasks:[
+          {id:'t11', text:'Learn to write a proper creative brief', sub:'Most performance marketers can\'t do this. Huge gap at mid-senior level.'},
+          {id:'t12', text:'Build your personal reporting template', sub:'What happened · Why · What next. For you, not your manager.'},
         ]
       }
     ]
   },
-  {
-    id: 'p3', cls: 'ph3', num: '3',
-    title: 'Visibility + job-ready',
-    sub: 'Make the work count outside your company',
-    badge: 'Weeks 10–12',
-    weeks: [
-      {
-        id: 'w6',
-        label: 'Week 10–11 · Case study + visibility',
-        resources: [
-          { label: 'How to write a marketing case study', url: 'https://marketingexamples.com/content/case-study' },
-          { label: 'LinkedIn post inspiration', url: 'https://www.linkedin.com/search/results/content/?keywords=performance%20marketing%20case%20study' },
+  { id:'p3', cls:'ph3', num:'III', title:'Visibility & Job-Ready', sub:'Make the work count outside your company', badge:'Weeks 10–12',
+    weeks:[
+      { id:'w6', label:'Week 10–11 · Case Study',
+        resources:[
+          {label:'Marketing Examples: Case Study Format', url:'https://marketingexamples.com/content/case-study'},
+          {label:'LinkedIn: Performance Marketing Posts', url:'https://www.linkedin.com/search/results/content/?keywords=performance%20marketing%20case%20study'},
         ],
-        tasks: [
-          { id: 't13', text: 'Write one case study from your best Kai campaign', sub: 'Real numbers, real decisions, real outcome, real learnings. No fluff.' },
-          { id: 't14', text: 'Post on LinkedIn — framed as a learning, not a brag', sub: 'Proof you\'ve crossed from button-pusher to thinker. Do it even if uncomfortable.' },
+        tasks:[
+          {id:'t13', text:'Write one case study from your best Kai campaign', sub:'Real numbers, real decisions, real outcome, real learnings. No fluff.'},
+          {id:'t14', text:'Post on LinkedIn — framed as a learning, not a brag', sub:'Proof you\'ve crossed from button-pusher to thinker.'},
         ]
       },
-      {
-        id: 'w7',
-        label: 'Week 12 · Job-ready',
-        resources: [
-          { label: 'Incrementality testing explained', url: 'https://www.facebook.com/business/help/1693381447650068' },
-          { label: 'Marketing Mix Modelling primer', url: 'https://www.thinkwithgoogle.com/marketing-strategies/data-and-measurement/marketing-mix-model-introduction/' },
-          { label: 'Server-side tracking basics', url: 'https://developers.google.com/tag-platform/tag-manager/server-side' },
+      { id:'w7', label:'Week 12 · Job-Ready',
+        resources:[
+          {label:'Meta: Incrementality Testing Guide', url:'https://www.facebook.com/business/help/1693381447650068'},
+          {label:'Think with Google: MMM Introduction', url:'https://www.thinkwithgoogle.com/marketing-strategies/data-and-measurement/marketing-mix-model-introduction/'},
+          {label:'Google: Server-Side Tracking Basics', url:'https://developers.google.com/tag-platform/tag-manager/server-side'},
         ],
-        tasks: [
-          { id: 't15', text: 'Rewrite resume with metrics you can now fully defend', sub: 'Every number — you lived through the analysis behind it this time.' },
-          { id: 't16', text: 'Practice defending your work out loud — every metric, every decision', sub: 'If you can explain it to a wall, you can explain it in an interview.' },
-          { id: 't17', text: 'Advanced topics to mention: incrementality, MMM, server-side tracking', sub: 'Knowing they exist already puts you ahead of most associates at interview.' },
+        tasks:[
+          {id:'t15', text:'Rewrite resume with metrics you can now fully defend', sub:'Every number — you lived through the analysis behind it this time.'},
+          {id:'t16', text:'Practice defending your work out loud — every metric', sub:'If you can explain it to a wall, you can explain it in an interview.'},
+          {id:'t17', text:'Study: incrementality, MMM basics, server-side tracking', sub:'Knowing they exist puts you ahead of most associates in any interview.'},
         ]
       }
     ]
   }
 ];
 
-const WEEK_ORDER = ['w1','w2','w3','w4','w5','w6','w7'];
-const TOTAL_TASKS = 17;
-const TOTAL_WEEKS = 7;
+const WEEK_ORDER=['w1','w2','w3','w4','w5','w6','w7'];
+const TOTAL_TASKS=17;
+let state={tasks:{},weeks:{},notes:{},habit:{},phases:{},april:false};
 
-// ─── STATE ───────────────────────────────────────────────────────
-let state = { tasks:{}, weeks:{}, notes:{}, habit:{}, phases:{}, april:false };
-let isSaving = false;
-
-function setSyncStatus(s) {
-  const dot = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-label');
-  if (s === 'syncing') { dot.className='sync-dot syncing'; label.textContent='Syncing...'; }
-  else if (s === 'synced') { dot.className='sync-dot'; label.textContent='Synced'; }
-  else { dot.className='sync-dot error'; label.textContent='Offline'; }
+function setSyncStatus(s){
+  const dot=document.getElementById('sync-dot'),label=document.getElementById('sync-label');
+  if(s==='syncing'){dot.className='sync-dot syncing';label.textContent='Transmuting...';}
+  else if(s==='synced'){dot.className='sync-dot';label.textContent='Synced';}
+  else{dot.className='sync-dot error';label.textContent='Offline';}
 }
 
-async function saveState() {
+async function saveState(){
   setSyncStatus('syncing');
-  try {
-    await setDoc(DOC_REF, { ...state, last_active: new Date().toISOString() });
-    setSyncStatus('synced');
-  } catch(e) {
-    setSyncStatus('error');
-  }
+  try{await setDoc(DOC_REF,{...state,last_active:new Date().toISOString()});setSyncStatus('synced');}
+  catch(e){setSyncStatus('error');}
 }
 
-// ─── WEEK LOCKING ────────────────────────────────────────────────
-function isWeekUnlocked(weekId) {
-  const idx = WEEK_ORDER.indexOf(weekId);
-  if (idx === 0) return true;
-  const prevWeekId = WEEK_ORDER[idx - 1];
-  return !!state.weeks[prevWeekId];
+function isWeekUnlocked(id){
+  const idx=WEEK_ORDER.indexOf(id);
+  if(idx===0) return true;
+  return !!state.weeks[WEEK_ORDER[idx-1]];
 }
 
-// ─── HABIT ───────────────────────────────────────────────────────
-function getToday() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function getNextTask(){
+  for(const phase of PHASES)
+    for(const week of phase.weeks){
+      if(!isWeekUnlocked(week.id)) continue;
+      for(const task of week.tasks)
+        if(!state.tasks[task.id]) return {task,week};
+    }
+  return null;
 }
 
-function getDayKey(offset) {
-  const d = new Date(); d.setDate(d.getDate() + offset);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function getNextNextTask(skipId){
+  let found=false;
+  for(const phase of PHASES)
+    for(const week of phase.weeks){
+      if(!isWeekUnlocked(week.id)) continue;
+      for(const task of week.tasks){
+        if(task.id===skipId){found=true;continue;}
+        if(found&&!state.tasks[task.id]) return {task,week};
+      }
+    }
+  return null;
 }
 
-function calcStreak() {
-  let streak = 0;
-  const d = new Date();
-  while(true) {
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    if (state.habit[key]) { streak++; d.setDate(d.getDate()-1); }
-    else break;
-  }
-  return streak;
+function renderFocus(){
+  const el=document.getElementById('focus-content');
+  const current=getNextTask();
+  if(!current){el.innerHTML=`<div class="focus-empty">⚗ The transmutation is complete. All tasks done.</div>`;return;}
+  const next=getNextNextTask(current.task.id);
+  el.innerHTML=`
+    <div class="focus-block">
+      <div class="focus-block-label">Do this now</div>
+      <div class="focus-task" onclick="toggleTask('${current.task.id}')">
+        ${current.task.text}
+        <span class="focus-task-sub">${current.week.label}</span>
+      </div>
+    </div>
+    ${next?`<div class="focus-block">
+      <div class="focus-block-label">Coming next</div>
+      <div class="focus-task next">${next.task.text}<span class="focus-task-sub">${next.week.label}</span></div>
+    </div>`:''}
+  `;
 }
 
-function renderHabit() {
-  const grid = document.getElementById('habit-grid');
-  const labelsEl = document.getElementById('day-labels');
-  const today = getToday();
-  const dayNames = ['S','M','T','W','T','F','S'];
-  labelsEl.innerHTML = ''; grid.innerHTML = '';
+function getToday(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function getDayKey(offset){const d=new Date();d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function calcStreak(){let s=0,d=new Date();while(true){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(state.habit[k]){s++;d.setDate(d.getDate()-1);}else break;}return s;}
 
-  for (let i = -6; i <= 0; i++) {
-    const key = getDayKey(i);
-    const d = new Date(); d.setDate(d.getDate()+i);
-    const lbl = document.createElement('div');
-    lbl.className = 'habit-day-label';
-    lbl.textContent = dayNames[d.getDay()];
-    labelsEl.appendChild(lbl);
-
-    const cell = document.createElement('div');
-    cell.className = 'habit-day' + (state.habit[key]?' done':'') + (key===today?' today':'');
-    cell.onclick = () => { state.habit[key]=!state.habit[key]; saveState(); renderHabit(); };
+function renderHabit(){
+  const grid=document.getElementById('habit-grid'),labelsEl=document.getElementById('day-labels'),today=getToday();
+  const dayNames=['S','M','T','W','T','F','S'];
+  labelsEl.innerHTML='';grid.innerHTML='';
+  for(let i=-6;i<=0;i++){
+    const key=getDayKey(i),d=new Date();d.setDate(d.getDate()+i);
+    const lbl=document.createElement('div');lbl.className='habit-day-label';lbl.textContent=dayNames[d.getDay()];labelsEl.appendChild(lbl);
+    const cell=document.createElement('div');
+    cell.className='habit-day'+(state.habit[key]?' done':'')+(key===today?' today':'');
+    cell.onclick=()=>{state.habit[key]=!state.habit[key];saveState();renderHabit();};
     grid.appendChild(cell);
   }
-
-  const streak = calcStreak();
-  document.getElementById('streak-display').innerHTML = `${streak} <span>days</span>`;
-  document.getElementById('stat-streak').textContent = streak;
-  const note = document.getElementById('streak-note');
-  if (streak===0) note.textContent='Start today.';
-  else if (streak<7) note.textContent=`${7-streak} more days to first week.`;
-  else if (streak<30) note.textContent=`${30-streak} days to one month.`;
-  else note.textContent=`${streak} days. Verstappen level.`;
+  const streak=calcStreak();
+  document.getElementById('streak-display').innerHTML=`${streak}<span>days</span>`;
+  document.getElementById('stat-streak').textContent=streak;
+  const note=document.getElementById('streak-note');
+  if(streak===0)note.textContent='Begin today.';
+  else if(streak<7)note.textContent=`${7-streak} more to first week.`;
+  else if(streak<30)note.textContent=`${30-streak} days to a month.`;
+  else note.textContent=`${streak} days. Gate open.`;
 }
 
-window.markToday = function() { state.habit[getToday()]=true; saveState(); renderHabit(); showToast('Day marked ✓'); };
-window.undoToday = function() { state.habit[getToday()]=false; saveState(); renderHabit(); };
+window.markToday=function(){state.habit[getToday()]=true;saveState();renderHabit();showToast('Day marked ✓');};
+window.undoToday=function(){state.habit[getToday()]=false;saveState();renderHabit();};
 
-// ─── PHASES ──────────────────────────────────────────────────────
-function renderPhases() {
-  const container = document.getElementById('phases-container');
-  container.innerHTML = '';
-
-  PHASES.forEach(phase => {
-    const allTasks = phase.weeks.flatMap(w=>w.tasks);
-    const doneTasks = allTasks.filter(t=>state.tasks[t.id]).length;
-    const doneWeeks = phase.weeks.filter(w=>state.weeks[w.id]).length;
-    const pct = Math.round((doneTasks/allTasks.length)*100);
-    const isComplete = doneTasks===allTasks.length;
-    const isOpen = state.phases[phase.id]!==false;
-
-    const el = document.createElement('div');
-    el.className = `phase ${phase.cls}${isOpen?' open':''}${isComplete?' complete':''}`;
-    el.id = `phase-${phase.id}`;
-
-    el.innerHTML = `
+function renderPhases(){
+  const container=document.getElementById('phases-container');container.innerHTML='';
+  PHASES.forEach(phase=>{
+    const allTasks=phase.weeks.flatMap(w=>w.tasks);
+    const doneTasks=allTasks.filter(t=>state.tasks[t.id]).length;
+    const doneWeeks=phase.weeks.filter(w=>state.weeks[w.id]).length;
+    const pct=Math.round((doneTasks/allTasks.length)*100);
+    const isComplete=doneTasks===allTasks.length;
+    const isOpen=state.phases[phase.id]!==false;
+    const el=document.createElement('div');
+    el.className=`phase ${phase.cls}${isOpen?' open':''}${isComplete?' complete':''}`;
+    el.id=`phase-${phase.id}`;
+    el.innerHTML=`
       <div class="phase-header" onclick="togglePhase('${phase.id}')">
-        <div class="phase-dot">${isComplete?'✓':phase.num}</div>
-        <div class="phase-meta">
-          <h3>${phase.title}</h3>
-          <p>${phase.sub}</p>
-        </div>
-        <div class="phase-right">
-          <span class="phase-badge">${phase.badge}</span>
-          <span class="phase-progress-mini${isComplete?' done':''}">${doneTasks}/${allTasks.length} tasks · ${doneWeeks}/${phase.weeks.length} wks</span>
-          <div class="phase-progress-track">
-            <div class="phase-progress-fill" style="width:${pct}%"></div>
-          </div>
-        </div>
+        <div class="phase-num">${isComplete?'✓':phase.num}</div>
+        <div class="phase-meta"><h3>${phase.title}</h3><p>${phase.sub}</p></div>
+        <div class="phase-right"><span class="phase-badge">${phase.badge}</span><span class="phase-pct${isComplete?' done':''}">${pct}%</span></div>
         <span class="chevron">▶</span>
       </div>
       <div class="phase-body">
-        ${phase.weeks.map((week,wi) => {
-          const unlocked = isWeekUnlocked(week.id);
-          const weekDone = state.weeks[week.id]||false;
-          const tasksDone = week.tasks.filter(t=>state.tasks[t.id]).length;
-          const weekPct = Math.round((tasksDone/week.tasks.length)*100);
-          const justUnlocked = unlocked && wi>0 && state.weeks[WEEK_ORDER[WEEK_ORDER.indexOf(week.id)-1]];
-
+        ${phase.weeks.map((week,wi)=>{
+          const unlocked=isWeekUnlocked(week.id);
+          const weekDone=state.weeks[week.id]||false;
+          const tasksDone=week.tasks.filter(t=>state.tasks[t.id]).length;
+          const weekPct=Math.round((tasksDone/week.tasks.length)*100);
+          const prevId=WEEK_ORDER[WEEK_ORDER.indexOf(week.id)-1];
+          const justUnlocked=unlocked&&wi>0&&state.weeks[prevId];
           return `
           <div class="week-block${!unlocked?' locked':''}" id="week-${week.id}">
-            ${justUnlocked ? `<div class="unlock-banner">🔓 Week unlocked — here's what to do next and where to go</div>` : ''}
+            ${justUnlocked?`<div class="unlock-banner">🔓 Gate opened — scrolls revealed below</div>`:''}
             <div class="week-header">
               <span class="week-label-text">${week.label}</span>
               <span class="week-pct">${unlocked?weekPct+'%':''}</span>
-              ${!unlocked ? `<span class="lock-icon">🔒</span>` : `<div class="week-check${weekDone?' done':''}" onclick="toggleWeek('${week.id}')" title="Mark week complete">${weekDone?'✓':''}</div>`}
+              ${!unlocked?`<span style="font-size:12px;color:var(--faint-text)">🔒</span>`:`<div class="week-check${weekDone?' done':''}" onclick="toggleWeek('${week.id}')">${weekDone?'✓':''}</div>`}
             </div>
-            ${unlocked ? `
-            <div class="week-resources">
-              <div class="week-resources-label">Resources for this week</div>
-              <div class="resource-list">
-                ${week.resources.map(r=>`
-                <div class="resource-item">
-                  <a href="${r.url}" target="_blank">${r.label}</a>
-                </div>`).join('')}
-              </div>
-            </div>` : ''}
-            ${week.tasks.map(task => {
-              const done = state.tasks[task.id]||false;
-              return `
+            ${unlocked?`<div class="week-resources"><div class="week-resources-label">Scrolls for this week</div><div class="resource-list">${week.resources.map(r=>`<div class="resource-item"><a href="${r.url}" target="_blank">${r.label}</a></div>`).join('')}</div></div>`:''}
+            ${week.tasks.map(task=>{const done=state.tasks[task.id]||false;return `
               <div class="task-row">
                 <div class="task-check${done?' done':''}" onclick="toggleTask('${task.id}')">✓</div>
                 <div class="task-content">
                   <div class="task-text${done?' done':''}" onclick="toggleTask('${task.id}')">${task.text}</div>
                   <span class="task-sub${done?' done':''}">${task.sub}</span>
                 </div>
-              </div>`;
-            }).join('')}
+              </div>`;}).join('')}
           </div>`;
         }).join('')}
         <div class="notes-section">
-          <div class="notes-label">Notes for this phase</div>
-          <textarea class="notes-input" placeholder="Your thoughts, learnings, questions..." onchange="saveNote('${phase.id}',this.value)">${state.notes[phase.id]||''}</textarea>
+          <div class="notes-label">Field Notes</div>
+          <textarea class="notes-input" placeholder="Observations, insights, questions from this phase..." onchange="saveNote('${phase.id}',this.value)">${state.notes[phase.id]||''}</textarea>
         </div>
-      </div>
-    `;
+      </div>`;
     container.appendChild(el);
   });
-
-  updateStats();
+  updateStats();renderFocus();
 }
 
-window.togglePhase = function(id) {
-  const el = document.getElementById(`phase-${id}`);
-  const isOpen = el.classList.contains('open');
-  el.classList.toggle('open',!isOpen);
-  state.phases[id]=!isOpen; saveState();
-};
+window.togglePhase=function(id){const el=document.getElementById(`phase-${id}`);const isOpen=el.classList.contains('open');el.classList.toggle('open',!isOpen);state.phases[id]=!isOpen;saveState();};
+window.toggleTask=function(id){state.tasks[id]=!state.tasks[id];saveState();renderPhases();if(state.tasks[id])showToast('Task complete ✓');};
+window.toggleWeek=function(id){const wasUndone=!state.weeks[id];state.weeks[id]=!state.weeks[id];saveState();renderPhases();if(wasUndone){const idx=WEEK_ORDER.indexOf(id);showToast(idx<WEEK_ORDER.length-1?'🔓 Next gate opened!':'Week complete ✓');}};
+window.saveNote=function(phaseId,val){state.notes[phaseId]=val;saveState();};
+window.toggleApril=function(){state.april=!state.april;document.getElementById('april-check').classList.toggle('done',state.april);saveState();if(state.april)showToast('April task sealed ✓');};
 
-window.toggleTask = function(id) {
-  state.tasks[id]=!state.tasks[id];
-  saveState(); renderPhases();
-  if(state.tasks[id]) showToast('Task complete ✓');
-};
-
-window.toggleWeek = function(id) {
-  const wasUndone = !state.weeks[id];
-  state.weeks[id]=!state.weeks[id];
-  saveState(); renderPhases();
-  if(wasUndone) {
-    const idx = WEEK_ORDER.indexOf(id);
-    if(idx<WEEK_ORDER.length-1) showToast('🔓 Next week unlocked!');
-    else showToast('Week complete ✓');
-  }
-};
-
-window.saveNote = function(phaseId,val) { state.notes[phaseId]=val; saveState(); };
-
-window.toggleApril = function() {
-  state.april=!state.april;
-  const el = document.getElementById('april-check');
-  el.classList.toggle('done',state.april);
-  saveState();
-  if(state.april) showToast('April task marked ✓');
-};
-
-// ─── STATS ───────────────────────────────────────────────────────
-function updateStats() {
-  const doneTasks = Object.values(state.tasks).filter(Boolean).length;
-  const doneWeeks = Object.values(state.weeks).filter(Boolean).length;
-  const pct = Math.round((doneTasks/TOTAL_TASKS)*100);
+function updateStats(){
+  const doneTasks=Object.values(state.tasks).filter(Boolean).length;
+  const doneWeeks=Object.values(state.weeks).filter(Boolean).length;
+  const pct=Math.round((doneTasks/TOTAL_TASKS)*100);
   document.getElementById('stat-overall').textContent=pct+'%';
   document.getElementById('stat-tasks').textContent=doneTasks;
   document.getElementById('stat-tasks-sub').textContent=`of ${TOTAL_TASKS} done`;
   document.getElementById('stat-weeks').textContent=doneWeeks;
   document.getElementById('overall-pct').textContent=pct+'%';
   document.getElementById('overall-bar').style.width=pct+'%';
-  const aprilEl = document.getElementById('april-check');
-  if(aprilEl) aprilEl.classList.toggle('done',!!state.april);
+  document.getElementById('april-check').classList.toggle('done',!!state.april);
 }
 
-// ─── TOAST ───────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+window.confirmReset=function(){if(confirm('Reset all progress? This cannot be undone.')){state={tasks:{},weeks:{},notes:{},habit:{},phases:{},april:false};saveState();renderPhases();renderHabit();showToast('Codex reset');}};
 
-// ─── RESET ───────────────────────────────────────────────────────
-window.confirmReset = function() {
-  if(confirm('Reset all progress? This cannot be undone.')) {
-    state={tasks:{},weeks:{},notes:{},habit:{},phases:{},april:false};
-    saveState(); renderPhases(); renderHabit();
-    showToast('Progress reset');
-  }
+window.signInWithGoogle=async function(){
+  try{ await signInWithPopup(auth,provider); }
+  catch(e){ showToast('Sign in failed. Try again.'); }
 };
 
-// ─── INIT ────────────────────────────────────────────────────────
-async function init() {
-  try {
-    const snap = await getDoc(DOC_REF);
-    if(snap.exists()) {
-      const data = snap.data();
-      state.tasks = data.tasks||{};
-      state.weeks = data.weeks||{};
-      state.notes = data.notes||{};
-      state.habit = data.habit||{};
-      state.phases = data.phases||{};
-      state.april = data.april||false;
-    }
-  } catch(e) { setSyncStatus('error'); }
+window.doSignOut=async function(){
+  await signOut(auth);
+};
 
-  renderPhases();
-  renderHabit();
-
-  // Hide loading
-  setTimeout(()=>{
-    document.getElementById('loading').classList.add('hidden');
-  }, 1000);
-
-  // Real-time sync
-  onSnapshot(DOC_REF, (snap) => {
-    if(snap.exists() && !isSaving) {
-      const data = snap.data();
-      state.tasks = data.tasks||{};
-      state.weeks = data.weeks||{};
-      state.notes = data.notes||{};
-      state.habit = data.habit||{};
-      state.phases = data.phases||{};
-      state.april = data.april||false;
-      renderPhases();
-      renderHabit();
-    }
-  });
+async function loadAndRender(){
+  try{
+    const snap=await getDoc(DOC_REF);
+    if(snap.exists()){const data=snap.data();state.tasks=data.tasks||{};state.weeks=data.weeks||{};state.notes=data.notes||{};state.habit=data.habit||{};state.phases=data.phases||{};state.april=data.april||false;}
+  }catch(e){setSyncStatus('error');}
+  renderPhases();renderHabit();
+  onSnapshot(DOC_REF,(snap)=>{if(snap.exists()){const data=snap.data();state.tasks=data.tasks||{};state.weeks=data.weeks||{};state.notes=data.notes||{};state.habit=data.habit||{};state.phases=data.phases||{};state.april=data.april||false;renderPhases();renderHabit();}});
 }
 
-init();
+onAuthStateChanged(auth, async(user)=>{
+  document.getElementById('loading').classList.add('hidden');
+  if(!user){
+    document.getElementById('login-screen').classList.add('visible');
+    document.getElementById('access-denied').classList.remove('visible');
+    document.getElementById('app').style.display='none';
+    return;
+  }
+  if(user.uid!==ALLOWED_UID){
+    document.getElementById('login-screen').classList.remove('visible');
+    document.getElementById('access-denied').classList.add('visible');
+    document.getElementById('app').style.display='none';
+    return;
+  }
+  document.getElementById('login-screen').classList.remove('visible');
+  document.getElementById('access-denied').classList.remove('visible');
+  document.getElementById('app').style.display='block';
+  const avatarEl=document.getElementById('user-avatar');
+  const nameEl=document.getElementById('user-name');
+  if(user.photoURL){avatarEl.innerHTML=`<img src="${user.photoURL}" alt="avatar">`;}
+  else{avatarEl.textContent=user.displayName?user.displayName[0]:'A';}
+  if(nameEl) nameEl.textContent=user.displayName||'Arun';
+  await loadAndRender();
+});
 </script>
 </body>
 </html>
