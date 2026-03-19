@@ -464,7 +464,14 @@ h1 em { color: var(--gold); font-style: normal; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { 
+  getAuth, 
+  signInWithRedirect, 
+  getRedirectResult, 
+  GoogleAuthProvider, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "%%FIREBASE_API_KEY%%",
@@ -481,6 +488,15 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+  getRedirectResult(auth)
+  .then((result) => {
+    if (result) {
+      console.log("Login success:", result.user);
+    }
+  })
+  .catch((error) => {
+    console.error("Redirect error:", error);
+  });
 const DOC_REF = doc(db, "tracker", "arun");
 
 const PHASES = [
@@ -748,9 +764,13 @@ function updateStats(){
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 window.confirmReset=function(){if(confirm('Reset all progress? This cannot be undone.')){state={tasks:{},weeks:{},notes:{},habit:{},phases:{},april:false};saveState();renderPhases();renderHabit();showToast('Codex reset');}};
 
-window.signInWithGoogle=async function(){
-  try{ await signInWithPopup(auth,provider); }
-  catch(e){ showToast('Sign in failed. Try again.'); }
+window.signInWithGoogle = async function(){
+  try {
+    await signInWithRedirect(auth, provider);
+  } catch(e) {
+    console.error(e);
+    showToast('Sign in failed. Try again.');
+  }
 };
 
 window.doSignOut=async function(){
